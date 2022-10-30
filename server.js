@@ -1,7 +1,4 @@
 const express = require("express");
-
-const app = express()
-
 const { fork } = require("child_process");
 const cluster=require('cluster')
 const numCPUs=require('os').cpus().length
@@ -17,11 +14,30 @@ const args = yargs(process.argv.slice(2))
 
   }).argv;
 
-const PORT = parseInt(process.argv[1]) || 8082;
+const PORT = process.argv[4] || 8082;
+const clusterMode=process.argv[3] === 'CLUSTER'
 
-console.log(process.argv)
+console.log(clusterMode)
 
-app.get("/info", (req, res) => {
+// app.use(express.static("public"));
+
+
+if(clusterMode && cluster.isPrimary){
+  console.log('Cluster iniciado')
+  for(let i = 0; i < numCPUs; i++){
+    cluster.fork()
+  }
+
+  cluster.on('exit', worker=>{
+    console.log(`Worker ${worker.process.pid} died`)
+    cluster.fork()
+  })
+}else{
+  const app = express()
+  app.use(express.json());
+  app.use(express.urlencoded({ extended: true }));
+  
+  app.get("/info", (req, res) => {
     const memory = process.memoryUsage();
     res.json({
       "Argumentos de entrada": args._,
@@ -31,20 +47,21 @@ app.get("/info", (req, res) => {
       "Path de Ejecucion": process.execPath,
       "Process Id": process.pid,
       "Carpeta del Proyecto": process.cwd(),
-      'Numero de Cpus':numCPUs
+      'Numero de Cpus':numCPUs,
+      "Puerto":PORT
     });
   });
-
-
-app.get("/api/randoms", (req, res) => {
-const child = fork("./fork/child.js");
-const cantidad = req.query.cantidad ? req.query.cantidad : 1000000000;
-child.send(cantidad);
-child.on("message", (msg) => {
-    console.log(msg)
+  
+  
+  app.get("/api/randoms", (req, res) => {
+    const child = fork("./fork/child.js");
+    const cantidad = req.query.cantidad ? req.query.cantidad : 1000000000;
+    child.send(cantidad);
+    child.on("message", (msg) => {
+      console.log(msg)
     res.json({"Numeros Randoms:": msg})
     res.end();
-});
+  });
 });
 
 app.get("/datos", (req, res) => {
@@ -53,6 +70,8 @@ app.get("/datos", (req, res) => {
 });
 
 
-app.listen(PORT, (err) => {
-  if (!err) console.log(`Servidor iniciado en PORT: ${PORT} - PID: ${process.pid} }`);
+app.listen(PORT, () => {
+  console.log(`Servidor iniciado en PORT: ${PORT} - PID: ${process.pid} }`);
 })
+
+}
