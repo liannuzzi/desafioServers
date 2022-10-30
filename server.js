@@ -14,10 +14,12 @@ const args = yargs(process.argv.slice(2))
 
   }).argv;
 
-const PORT = process.argv[4] || 8082;
+const PORT = process.argv[2] || 8082;
 const clusterMode=process.argv[3] === 'CLUSTER'
 
-console.log(clusterMode)
+
+
+console.log(process.argv[3])
 
 // app.use(express.static("public"));
 
