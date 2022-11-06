@@ -77,7 +77,7 @@ app.get("/datos", (req, res) => {
   res.send(`Servidor express nginx en ${PORT} - PID: ${process.pid} - Date: ${(new Date).toLocaleString()}`);
 });
 
-routerProducto.get('*', (req,res)=>{
+app.get('*', (req,res)=>{
   res.status(400).send('Ruta no encontrada' + req.url)
 })
 
