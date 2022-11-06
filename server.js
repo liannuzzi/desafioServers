@@ -39,6 +39,12 @@ if(clusterMode && cluster.isPrimary){
   app.use(express.json());
   app.use(express.urlencoded({ extended: true }));
   
+
+  app.get("/", (req, res) => {
+    res.redirect('/info');
+  });
+
+
   app.get("/info", (req, res) => {
     const memory = process.memoryUsage();
     res.json({
@@ -70,6 +76,10 @@ app.get("/datos", (req, res) => {
   console.log(`PORT: ${PORT}} -> Date: ${Date.now()}`)
   res.send(`Servidor express nginx en ${PORT} - PID: ${process.pid} - Date: ${(new Date).toLocaleString()}`);
 });
+
+routerProducto.get('*', (req,res)=>{
+  res.status(400).send('Ruta no encontrada' + req.url)
+})
 
 
 app.listen(PORT, () => {
