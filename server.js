@@ -17,10 +17,6 @@ const args = yargs(process.argv.slice(2))
 const PORT = process.argv[2] || 8082;
 const clusterMode=process.argv[3] === 'CLUSTER'
 
-
-
-console.log(process.argv[3])
-
 // app.use(express.static("public"));
 
 
@@ -83,7 +79,7 @@ app.get('*', (req,res)=>{
 
 
 app.listen(PORT, () => {
-  console.log(`Servidor iniciado en PORT: ${PORT} - PID: ${process.pid} }`);
+  console.log(`Servidor iniciado en PORT: ${PORT} - PID: ${process.pid}`);
 })
 
 }
