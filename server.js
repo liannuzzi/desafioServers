@@ -14,7 +14,10 @@ const args = yargs(process.argv.slice(2))
 
   }).argv;
 
-const PORT = process.argv[2] || 8082;
+
+
+// Se modifica const PORT = process.argv[2] || 8082 por  const PORT = process.env.PORT || 8082 para usar heroku
+const PORT = process.env.PORT || 8082;
 const clusterMode=process.argv[3] === 'CLUSTER'
 
 // app.use(express.static("public"));
